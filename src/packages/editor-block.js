@@ -15,15 +15,20 @@ export default defineComponent({
     const blockRef = ref(null)
     onMounted(() => {
       const { offsetWidth, offsetHeight } = blockRef.value
+      let block = {
+        ...props.block,
+        width: offsetWidth,
+        height: offsetHeight
+      }
       if (props.block.alignCenter) { //拖拽松手时
-        const block = {
-          ...props.block,
+        block = {
+          ...block,
           left: props.block.left - offsetWidth / 2,
           top: props.block.top - offsetHeight / 2,
           alignCenter: false
         }
-        props.updateBlock(block)
       }
+      props.updateBlock(block)
     })
     return () => {
       const component = config.componentMap[props.block.key]

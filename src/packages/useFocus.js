@@ -1,10 +1,14 @@
-import {computed} from 'vue'
+import {computed, ref} from 'vue'
 export default function useFocus(data, callback) {
-  const blockMousedown = (e, block) => {
+  const selectedIndex = ref(-1)
+  const lastSelectedBlock = computed(() => {
+    return data.value.blocks[selectedIndex.value]
+  })
+  const blockMousedown = (e, block, index) => {
     e.stopPropagation()
     e.preventDefault()
     if (e.shiftKey) {
-      if (focusData.value.length === 1) {
+      if (focusData.value.focus.length === 1) {
         block.focus = true
       } else {
         block.focus = !block.focus
@@ -15,8 +19,8 @@ export default function useFocus(data, callback) {
         clearFocus()
         block.focus = true
       }
-      // block.focus = !block.focus
     }
+    selectedIndex.value = index
     callback(e)
   }
 
@@ -39,6 +43,7 @@ export default function useFocus(data, callback) {
   return {
     blockMousedown,
     focusData,
-    canvasMounsedown
+    canvasMounsedown,
+    lastSelectedBlock
   }
 }

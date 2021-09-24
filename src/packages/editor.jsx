@@ -28,10 +28,10 @@ export default defineComponent({
     }
     const canvasRef = ref(null)
     const {dragstart, dragend} = useMenuDragger(canvasRef, data)
-    const {blockMousedown, focusData, canvasMounsedown} = useFocus(data, e => {
+    const {blockMousedown, focusData, canvasMounsedown, lastSelectedBlock} = useFocus(data, e => {
       mousedown(e)
     })
-    const { mousedown } = useBlockDragger(focusData)
+    const { mousedown, markLine } = useBlockDragger(focusData, lastSelectedBlock, data)
     return () => (
       <div class="editor">
         <div class="editor-left">
@@ -53,10 +53,12 @@ export default defineComponent({
               {data.value.blocks.map((block, index) => {
                 return <EditorBlock block={block}
                 class={block.focus ? "block-focus" : ""}
-                onMousedown={e => blockMousedown(e, block)}
+                onMousedown={e => blockMousedown(e, block, index)}
                 updateBlock={(block) => updateBlock(block, index)}>
                 </EditorBlock>
               })}
+              {markLine.x !== null && <div class="line-x" style={{top: markLine.x + 'px'}}></div>}
+              {markLine.y !== null && <div class="line-y" style={{left: markLine.y + 'px'}}></div>}
             </div>
           </div>
         </div>
