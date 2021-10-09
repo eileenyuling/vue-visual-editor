@@ -10,6 +10,8 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "element-plus": "^1.1.0-beta.9",
+    "lodash": "^4.17.21",
+    "mitt": "^3.0.0",
     "vue": "^3.0.0"
   },
   "devDependencies": {

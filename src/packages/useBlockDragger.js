@@ -1,9 +1,11 @@
 import { reactive } from 'vue'
+import { events } from './events'
 export default function useBlockDragger(focusData, lastSelectedBlock, data) {
   let dragState = {
     startX: 0,
     startY: 0,
-    startPos: []
+    startPos: [],
+    isDragging: false
   }
   let markLine = reactive({
     x: null,
@@ -16,6 +18,7 @@ export default function useBlockDragger(focusData, lastSelectedBlock, data) {
       startY: e.clientY,
       startLeft: BLeft,
       startTop: BTop,
+      isDragging: false,
       startPos: focusData.value.focus.map(({top, left}) => ({top, left})),
       lines: (() => {
         const lines = {x: [], y: []}
@@ -50,6 +53,10 @@ export default function useBlockDragger(focusData, lastSelectedBlock, data) {
     let {clientX: moveX, clientY: moveY} = e
     // 计算当前元素最新的left和top
     // 鼠标移动后 - 鼠标移动前 + left
+    if (!dragState.isDragging) {
+      dragState.isDragging = true
+      events.emit('start')
+    }
     let left = moveX - dragState.startX + dragState.startLeft
     let top = moveY - dragState.startY + dragState.startTop
     let lineX = null
@@ -81,6 +88,10 @@ export default function useBlockDragger(focusData, lastSelectedBlock, data) {
   const mouseup = () => {
     document.removeEventListener('mousemove', mousemove)
     document.removeEventListener('mouseup', mouseup)
+    if (dragState.isDragging) {
+      events.emit('end')
+    }
+    dragState.isDragging = false
   }
   return {
     mousedown,

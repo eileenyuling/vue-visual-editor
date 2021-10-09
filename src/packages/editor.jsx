@@ -4,6 +4,7 @@ import './editor.scss'
 import useMenuDragger from "./useMenuDragger";
 import useFocus from './useFocus'
 import useBlockDragger from "./useBlockDragger";
+import useCommand from "./useCommand";
 export default defineComponent({
   props: {
     modelValue: {type: Object}
@@ -18,6 +19,7 @@ export default defineComponent({
         ctx.emit('update:modelValue', newValue)
       }
     })
+
     const canvasStyles = computed(() => ({
       width: `${data.value.container.width}px`,
       height: `${data.value.container.height}px`
@@ -32,6 +34,12 @@ export default defineComponent({
       mousedown(e)
     })
     const { mousedown, markLine } = useBlockDragger(focusData, lastSelectedBlock, data)
+    const { commands } = useCommand(data)
+
+    const buttons = [
+      {label: '撤销', handler: () => {commands.undo()}},
+      {label: '重做', handler: () => {commands.redo()}}
+    ]
     return () => (
       <div class="editor">
         <div class="editor-left">
@@ -45,7 +53,11 @@ export default defineComponent({
         })}
         </div>
         <div class="editor-middle">
-          <div class="editor-top"></div>
+          <div class="editor-top">
+            {buttons.map(button => {
+              return <button class="editor-top-btn" onClick={button.handler}>{button.label}</button>
+            })}
+          </div>
           <div class="editor-content">
             <div class="editor-canvas" style={canvasStyles.value}
             onMousedown={canvasMounsedown}

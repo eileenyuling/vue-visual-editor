@@ -1,3 +1,5 @@
+import { events } from "./events"
+
 export default function useMenuDragger(canvasRef, data) {
   let currentComponent = null
     const dragenter = (e) => {
@@ -31,12 +33,14 @@ export default function useMenuDragger(canvasRef, data) {
       canvasRef.value.addEventListener('dragover', dragover)
       canvasRef.value.addEventListener('dragleave', dragleave)
       canvasRef.value.addEventListener('drop', drop)
+      events.emit('start')
     }
     const dragend = () => {
       canvasRef.value.removeEventListener('dragenter', dragenter)
       canvasRef.value.removeEventListener('dragover', dragover)
       canvasRef.value.removeEventListener('dragleave', dragleave)
       canvasRef.value.removeEventListener('drop', drop)
+      events.emit('end')
     }
     return {
       dragstart,
