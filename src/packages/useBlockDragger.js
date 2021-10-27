@@ -70,7 +70,7 @@ export default function useBlockDragger(focusData, lastSelectedBlock, data) {
     let lineY = null
     const y = dragState.lines.y
     for (let i = 0; i < y.length; i++) {
-      if (Math.abs(left - y[i].left) < 1) {
+      if (Math.abs(left - y[i] .left) < 1) {
         lineY = y[i].showLeft
         break
       }

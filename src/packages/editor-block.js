@@ -1,4 +1,5 @@
 import { defineComponent, inject, onMounted, ref, computed } from "vue"
+import BlockResize from "./block-resize"
 
 export default defineComponent({
   props: {
@@ -9,7 +10,7 @@ export default defineComponent({
     const blockStyles = computed(() => ({
       top: `${props.block.top}px`,
       left: `${props.block.left}px`,
-      zIndex: `${props.block.zIndex}px`,
+      'z-index': `${props.block.zIndex}`
     }))
     const config = inject('config')
     const blockRef = ref(null)
@@ -32,9 +33,16 @@ export default defineComponent({
     })
     return () => {
       const component = config.componentMap[props.block.key]
-      const RenderComponent = component.render()
+      const RenderComponent = component.render({...props.block.props,
+        width: props.block.width,
+        height: props.block.height
+      } || {})
+      const {width, height} = component.resize || {}
       return (
-      <div class="editor-block" style={blockStyles.value} ref={blockRef}>{RenderComponent}</div>
+      <div class="editor-block" style={blockStyles.value} ref={blockRef}>
+        {RenderComponent}
+        {props.block.focus && (width || height) && <BlockResize block={props.block} component={component} updateBlock={props.updateBlock}></BlockResize>}
+      </div>
     )}
   }
 })

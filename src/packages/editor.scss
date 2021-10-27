@@ -6,10 +6,12 @@
   &-left,
   &-right {
     flex: 0 0 270px;
+    justify-content: flex-start;
     width: 270px;
     height: 100%;
-    background-color: red;
+    background-color: #ddd;
     overflow: auto;
+    padding-top: 10px;
   }
   &-middle {
     flex: 1;
@@ -67,6 +69,12 @@
       box-sizing: border-box;
     }
   }
+  &-block-preview {
+    position: absolute;
+    &:after {
+      display: none;
+    }
+  }
   &-left-item {
     display: flex;
     position: relative;
@@ -86,6 +94,7 @@
       opacity: 0.2;
       left: 0;
       top: 0;
+      z-index: 2;
     }
     >span {
       position: absolute;
@@ -110,4 +119,68 @@
   position: absolute;
   border-left: 1px dashed red;
   height: 100%;
+}
+.dropdown {
+  position: absolute;
+  border: 1px solid #ddd;
+  z-index: 999;
+}
+.dropdown-item {
+  line-height: 30px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  background-color: #fff;
+  padding: 0 10px;
+  user-select: none;
+  &:hover {
+    background-color: bisque;
+  }
+}
+
+.range {
+  display: flex;
+  align-items: center;
+}
+.block-resize {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  z-index: 999;
+  background-color: #00ff;
+  user-select: none;
+  &-top {
+    top: -4px;
+    left: calc(50% - 4px);
+  }
+  &-bottom {
+    bottom: -4px;
+    left: calc(50% - 4px);
+  }
+  &-right {
+    right: -4px;
+    top: calc(50% - 4px);
+  }
+  &-left {
+    left: -4px;
+    top: calc(50% - 4px);
+  }
+  &-top-left {
+    top: -4px;
+    left: -4px;
+  }
+  &-top-right {
+    top: -4px;
+    right: -4px;
+  }
+  &-bottom-left {
+    bottom: -4px;
+    left: -4px;
+  }
+  &-bottom-right {
+    bottom: -4px;
+    right: -4px;
+  }
+}
+.el-button {
+  transition: none !important;
 }

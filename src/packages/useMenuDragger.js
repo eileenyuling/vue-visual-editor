@@ -22,7 +22,8 @@ export default function useMenuDragger(canvasRef, data) {
             top: e.offsetY,
             zIndex: 1,
             key: currentComponent.key,
-            alignCenter: true
+            alignCenter: true,
+            props: {}
           }
         ]
       }

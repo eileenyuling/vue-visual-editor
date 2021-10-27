@@ -2,7 +2,7 @@ import { events } from "./events"
 import _ from 'lodash'
 import { onUnmounted } from "@vue/runtime-core"
 
-export default function useCommand(data) {
+export default function useCommand(data, focusData) {
   const state = {
     commandArray: [],
     commands: {},
@@ -41,7 +41,118 @@ export default function useCommand(data) {
       }
     }
   })
+  register({
+    name: 'placeTop',
+    pushQueue: true,
+    execute() {
+      const before = _.cloneDeep(data.value.blocks)
+      const after = (() => {
+        const maxZIndex = focusData.value.unfocus.reduce((prev, block) => {
+          return Math.max(prev, block.zIndex)
+        }, -Infinity) + 1
+        focusData.value.focus.forEach(block => {
+          block.zIndex = maxZIndex
+        })
+        return data.value.blocks
+      })()
 
+      return {
+        redo() {
+          data.value = {...data.value, blocks: after}
+        },
+        undo() {
+          data.value = {...data.value, blocks: before}
+        }
+      }
+    }
+  })
+  register({
+    name: 'placeBottom',
+    pushQueue: true,
+    execute() {
+      const before = _.cloneDeep(data.value.blocks)
+      const after = (() => {
+        let minZIndex = focusData.value.unfocus.reduce((prev, block) => {
+          return Math.min(prev, block.zIndex)
+        }, Infinity) - 1
+        if (minZIndex < 0) {
+          minZIndex = 0
+          focusData.value.unfocus.forEach(block => {
+            block.zIndex += 1
+          })
+        }
+        focusData.value.focus.forEach(block => {
+          block.zIndex = minZIndex
+        })
+        return data.value.blocks
+      })()
+
+      return {
+        redo() {
+          data.value = {...data.value, blocks: after}
+        },
+        undo() {
+          data.value = {...data.value, blocks: before}
+        }
+      }
+    }
+  })
+  register({
+    name: 'deleteBlocks',
+    pushQueue: true,
+    execute() {
+      const before = _.cloneDeep(data.value.blocks)
+      const after = focusData.value.unfocus
+      return {
+        redo: () => {
+          data.value = {...data.value, blocks: after}
+        },
+        undo: () => {
+          data.value = {...data.value, blocks: before}
+        }
+      }
+    }
+  })
+  register({
+    name: 'updateContainer',
+    pushQueue: true,
+    execute(newValue) {
+      let state = {
+        before: _.cloneDeep(data.value),
+        after: newValue
+      }
+      return {
+        redo: () => {
+          data.value = state.after
+        },
+        undo: () => {
+          data.value = state.before
+        }
+      }
+    }
+  })
+  register({
+    name: 'updateBlock',
+    pushQueue: true,
+    execute(newValue, oldValue) {
+      let state = {
+        before: _.cloneDeep(data.value.blocks),
+        after: (() => {
+          const index = data.value.blocks.indexOf(oldValue)
+          data.value.blocks.splice(index, 1, newValue)
+          return data.value.blocks
+        })()
+      }
+      return {
+        redo: () => {
+          data.value = {...data.value, blocks: state.after}
+        },
+        undo: () => {
+          data.value = {...data.value, blocks: state.before}
+        }
+      }
+    }
+  })
   register({
     name: 'drag',
     pushQueue: true,
@@ -74,8 +185,8 @@ export default function useCommand(data) {
 
   function register(command) {
     state.commandArray.push(command)
-    state.commands[command.name] = () => {
-      const {redo, undo} = command.execute()
+    state.commands[command.name] = (...args) => {
+      const {redo, undo} = command.execute(...args)
       redo()
       if (command.pushQueue) {
         let { queue, current } = state
